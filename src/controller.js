@@ -41,3 +41,16 @@ export const createBook = (req, res, next) => {
     message: "Gagal menambahkan buku"
   });
 };
+
+export const getBook = (req, res) => {
+  const getAllBook = book.map((book) => ({
+    id: book.id,
+    name: book.name,
+    publisher: book.publisher
+  }));
+
+  return res.status(200).json({
+    status: "success",
+    data: getAllBook
+  });
+};
