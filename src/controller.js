@@ -23,10 +23,10 @@ export const createBook = (req, res, next) => {
   const updatedAt = insertedAt;
   const finished =  pageCount === readPage;
 
-  const newBook = { id, name, year, author, summary, publisher, pageCount, readPage, finished, insertedAt, updatedAt };
+  const newBook = { id, name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt };
   book.push(newBook);
 
-  const isSuccess = book.filter((book) => book.id === id).length > 0;
+  const isSuccess = book.filter((b) => b.id === id).length > 0;
 
   if (isSuccess) {
     return res.status(201).json({
@@ -43,15 +43,36 @@ export const createBook = (req, res, next) => {
 };
 
 export const getBook = (req, res) => {
-  const getAllBook = book.map((book) => ({
-    id: book.id,
-    name: book.name,
-    publisher: book.publisher
+  // const getAllBook = book.map((book) => ({
+  //   id: book.id,
+  //   name: book.name,
+  //   publisher: book.publisher
+  // }));
+
+  const { reading, finished, name } = req.query;
+  let filtered = [...book];
+
+  if (reading !== undefined) {
+    filtered = filtered.filter((b) => b.reading === (reading === '1'));
+  }
+
+  if (finished !== undefined) {
+    filtered = filtered.filter((b) => b.finished === (finished === '1'));
+  }
+
+  if (name !== undefined) {
+    filtered = filtered.filter((b) => b.name.toLowerCase().includes(name.toLowerCase()));
+  }
+
+  const getAllBook = filtered.map((b) => ({
+    id: b.id,
+    name: b.name,
+    publisher: b.publisher
   }));
 
   return res.status(200).json({
     status: "success",
-    data: getAllBook
+    data: { books: getAllBook }
   });
 };
 
@@ -62,7 +83,7 @@ export const getBookById = (req, res) => {
   if (books) {
     return res.status(200).json({
       status: "success",
-      data: { book }
+      data: { book: books }
     });
   }
   
